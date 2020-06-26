@@ -1,7 +1,0 @@
-apiVersion: v1
-name: prometheus
-version: 11.2.3
-appVersion: 2.18.1
-description: Prometheus is a monitoring system and time series database.
-engine: gotpl
-tillerVersion: ">=2.8.0"
