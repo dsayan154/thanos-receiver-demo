@@ -10,3 +10,6 @@
 - [x] prepare a custom values.yaml for prometheus installation in atom namespace 
 - [ ] install the prometheus to remote_write to thanos receiver
 - [ ] measure the performance of write duration, query evaluation, thanos receiver space utilisation
+
+## Creating a GKE cluster(terraform):
+TODO
