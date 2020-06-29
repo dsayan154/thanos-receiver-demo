@@ -1,6 +1,6 @@
 ## POC TODOs
 - [x] Provision local or GKE k8s cluster
-- [ ] create namespaces:
+- [x] create namespaces:
   - atom
   - ingestion
 - [ ] install thanos receiver statefulset and other required k8s objects
