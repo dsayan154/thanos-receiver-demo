@@ -27,7 +27,7 @@
 7. start a proxy server from another terminal
   `kubectl proxy`
 8. generate a access-token for login to the k8s-dashboard
-  `kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep service-controller-token | awk '{print $1}')`
+  `kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')`
 9. access the dashboard from[here](http://127.0.0.1:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/)(http://127.0.0.1:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/)
 10. enter the access token generated in step 8. to login
 11. `kubectl apply -f poc.yaml`
