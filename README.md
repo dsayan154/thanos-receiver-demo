@@ -33,4 +33,4 @@
 11. `kubectl apply -f poc.yaml`
 
 #### Destroy Infra:
-1. `terraform destroy`
+1. `terraform destroy`  
