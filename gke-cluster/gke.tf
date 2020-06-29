@@ -8,16 +8,25 @@ variable "gke_password" {
   description = "gke password"
 }
 
+variable "created_by" {
+  default     = ""
+  description = "created by"
+}
+
 variable "gke_node_count" {
   default     = 3
   description = "number of nodes of the gke cluster"
 }
 
 # GKE cluster
+data "google_container_engine_versions" "zone" {
+  location       = var.region
+}
 
 resource "google_container_cluster" "cluster" {
-  name        = "${var.stack_name}-gke"
-  location    = var.region
+  name                = "${var.stack_name}-gke"
+  location            = var.region
+  min_master_version  = data.google_container_engine_versions.zone.latest_master_version
   
   remove_default_node_pool  = true
   initial_node_count        = 1
@@ -32,6 +41,11 @@ resource "google_container_cluster" "cluster" {
     client_certificate_config {
       issue_client_certificate  = false
     }
+  }
+  resource_labels = {
+    env         = var.stack_name
+    created_by  = var.created_by
+    #provisioner = var.provisioner
   }
 }
 
@@ -49,7 +63,9 @@ resource "google_container_node_pool" "nodes" {
     ]
 
     labels = {
-      env = var.stack_name
+      env         = var.stack_name
+      created_by  = var.created_by
+      #provisioner = var.provisioner
     }
 
     preemptible  = true
