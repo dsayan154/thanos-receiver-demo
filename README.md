@@ -14,8 +14,7 @@
 ## Create POC infra on k8s
 1. `kubectl apply -f poc-ns.yaml`
 2. `kubectl apply -f poc-sa.yaml -n ingestion`
-3. `kubectl apply -f poc-cm.yaml -n ingestion`
-4. `kubectl -n ingestion create secret generic gcs-bucket-credentials --from-file=gcs-bucket-secret.yaml`
-5. `kubectl apply -f poc-sts.yaml -n ingestion`
-6. `kubectl apply -f poc-svc.yaml -n ingestion`
-7. `helm upgrade --install prometheus stable/prometheus --namespace atom -f values.yaml --debug`
+3. `kubectl -n ingestion create secret generic gcs-bucket-credentials --from-file=gcs-bucket-secret.yaml`
+4. `kubectl apply -f poc-sts.yaml -n ingestion`
+5. `kubectl apply -f poc-svc.yaml -n ingestion`
+6. `helm upgrade --install prometheus stable/prometheus --namespace atom -f values.yaml --debug`
