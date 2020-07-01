@@ -1,0 +1,10 @@
+[
+    {
+        "hashring":"default",
+        "tenants":[],
+        "endpoints":[
+            "thanos-receive-0.thanos-receive.ingestion.svc.cluster.local:10901",
+            "thanos-receive-1.thanos-receive.ingestion.svc.cluster.local:10901"
+        ]
+    }
+]
