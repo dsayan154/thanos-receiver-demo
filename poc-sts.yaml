@@ -7,7 +7,7 @@ metadata:
     controller.receive.thanos.io: thanos-receive-controller
     controller.receive.thanos.io/hashring: default
 spec:
-  replicas: 3
+  replicas: 1
   podManagementPolicy: Parallel
   selector:
     matchLabels:
@@ -39,12 +39,6 @@ spec:
         - --http-address=0.0.0.0:10902
         - --remote-write.address=0.0.0.0:19291
         - --objstore.config-file=/etc/prometheus/gcs-bucket-secret.yaml
-        - --label=replica="$(NAME)"
-        - --label=receive="true"
-        - --receive.replication-factor=3
-        - --receive.local-endpoint=$(NAME).thanos-receive.$(NAMESPACE).svc.cluster.local:10901
-        - --receive.hashrings-file=/etc/thanos-receive/hashrings.json
-        - --receive.hashrings-file-refresh-interval=1m
         livenessProbe:
           failureThreshold: 8
           httpGet:
@@ -73,19 +67,10 @@ spec:
           readOnly: true
         - name: remote-write-data
           mountPath: /data/remote-write-receive-data
-          readOnly: false
-        - name: hashrings-config
-          mountPath: /etc/thanos-receive/
       volumes:
       - name: gcs-bucket-credentials
         secret:
           secretName: gcs-bucket-credentials
-      - name: hashrings-config
-        configMap:
-          name: thanos-receive-config-generated
-          items:
-          - key: hashrings.json
-            path: hashrings.json
   volumeClaimTemplates:
   - metadata:
       name: remote-write-data
