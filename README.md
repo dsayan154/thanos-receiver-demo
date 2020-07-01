@@ -8,7 +8,7 @@
 - [x] configure thanos receive to persist data in PVs
 - [ ] configure thanos receive to behave as a cluster with replication
 - [x] prepare a custom values.yaml for prometheus installation in atom namespace 
-- [ ] install the prometheus to remote_write to thanos receiver
+- [x] install the prometheus to remote_write to thanos receiver
 - [ ] measure the performance of write duration, query evaluation, thanos receiver space utilisation
 
 ## Create POC infra on k8s
