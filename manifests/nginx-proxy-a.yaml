@@ -1,0 +1,94 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  labels:
+    app: nginx-proxy
+    tenant: a
+  name: nginx-proxy-a
+  namespace: tenant-a
+data:
+  nginx.conf: |-
+    worker_processes  5;  ## Default: 1
+    error_log  /dev/stderr;
+    pid        /tmp/nginx.pid;
+    worker_rlimit_nofile 8192;
+
+    events {
+      worker_connections  4096;  ## Default: 1024
+    }
+
+    http {
+      default_type application/octet-stream;
+      log_format   main '$remote_addr - $remote_user [$time_local]  $status '
+        '"$request" $body_bytes_sent "$http_referer" '
+        '"$http_user_agent" "$http_x_forwarded_for"';
+      access_log   /dev/stderr  main;
+      sendfile     on;
+      tcp_nopush   on;
+      resolver kube-dns.kube-system.svc.cluster.local;
+
+      server { # reverse-proxy and tenant header setting
+        listen 80;
+        proxy_set_header THANOS-TENANT a;
+
+        location / {
+          proxy_pass      http://thanos-receive.thanos.svc.cluster.local:19291$request_uri;
+        }
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx-proxy
+    tenant: a
+  name: nginx-proxy-a
+  namespace: tenant-a
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-proxy
+      tenant: a
+      part-of: thanos
+  template:
+    metadata:
+      labels:
+        app: nginx-proxy
+        tenant: a
+        part-of: thanos
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 80
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/nginx
+      volumes:
+        - name: config-volume
+          configMap:
+            name: nginx-proxy-a
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nginx-proxy
+    tenant: a
+    servicemonitor: default-servicemonitor
+    monitor: "false"
+  name: nginx-proxy-a
+  namespace: tenant-a
+spec:
+  ports:
+  - name: web
+    port: 80
+    targetPort: http
+  selector:
+    app: nginx-proxy
+    tenant: a
