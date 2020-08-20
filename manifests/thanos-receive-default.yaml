@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: thanos-receive
+    tenant: default-tenant
+    controller.receive.thanos.io: thanos-receive-controller
+    controller.receive.thanos.io/hashring: default
+    part-of: thanos
+  name: thanos-receive-default
+  namespace: thanos
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: thanos-receive
+      tenant: default-tenant
+      controller.receive.thanos.io: thanos-receive-controller
+      controller.receive.thanos.io/hashring: default
+      part-of: thanos
+  serviceName: thanos-receive-default 
+  template:
+    metadata:
+      labels:
+        app: thanos-receive
+        tenant: default-tenant
+        controller.receive.thanos.io: thanos-receive-controller
+        controller.receive.thanos.io/hashring: default
+        part-of: thanos
+    spec:
+      affinity: {}
+      containers:
+      - args:
+        - receive
+        - --receive.replication-factor=2
+        - --objstore.config=$(OBJSTORE_CONFIG)
+        - --tsdb.path=/var/thanos/receive
+        - --label=receive_replica="$(NAME)"
+        - --receive.local-endpoint=$(NAME).thanos-receive-default.$(NAMESPACE).svc.cluster.local:10901
+        - --tsdb.retention=15d
+        - --receive.default-tenant-id=cluster
+        - --receive.hashrings-file=/var/lib/thanos-receive/hashrings.json
+        env:
+        - name: NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: OBJSTORE_CONFIG
+          valueFrom:
+            secretKeyRef:
+              key: thanos-s3.yaml
+              name: thanos-objectstorage
+        image: quay.io/thanos/thanos:v0.14.0
+        livenessProbe:
+          failureThreshold: 8
+          httpGet:
+            path: /-/healthy
+            port: 10902
+            scheme: HTTP
+          periodSeconds: 30
+        name: thanos-receive
+        ports:
+        - containerPort: 10901
+          name: grpc
+        - containerPort: 10902
+          name: http
+        - containerPort: 19291
+          name: remote-write
+        readinessProbe:
+          failureThreshold: 20
+          httpGet:
+            path: /-/ready
+            port: 10902
+            scheme: HTTP
+          periodSeconds: 5
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /var/thanos/receive
+          name: data
+          readOnly: false
+        - mountPath: /var/lib/thanos-receive
+          name: hashring-config
+      terminationGracePeriodSeconds: 900
+      volumes:
+      - emptyDir: {}
+        name: data
+      - configMap:
+          name: thanos-receive-generated
+        name: hashring-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: thanos-receive
+    tenant: default-tenant
+    controller.receive.thanos.io/hashring: default
+    part-of: thanos
+  name: thanos-receive-default
+  namespace: thanos
+spec:
+  clusterIP: None
+  ports:
+  - name: grpc
+    port: 10901
+    targetPort: 10901
+  - name: http
+    port: 10902
+    targetPort: 10902
+  - name: remote-write
+    port: 19291
+    targetPort: 19291
+  selector:
+    app: thanos-receive
+    tenant: default-tenant
+    controller.receive.thanos.io: thanos-receive-controller
+    controller.receive.thanos.io/hashring: default
+    part-of: thanos

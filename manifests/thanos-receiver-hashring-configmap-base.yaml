@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: thanos-receive-base
+  namespace: thanos
+  labels:
+    part-of: thanos
+    app: thanos-receive-controller
+data:
+  hashrings.json: |
+    [
+        {
+            "hashring": "default"
+        },
+        {
+            "hashring": "hashring-0",
+            "tenants": ["tenant-a", "tenant-b"]
+        }
+    ]
