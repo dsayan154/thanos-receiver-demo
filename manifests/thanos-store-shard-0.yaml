@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: thanos-store
+    shard: shard-0
+    tenant: a
+    part-of: thanos
+  name: thanos-store-shard-0
+  namespace: thanos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: thanos-store
+      shard: shard-0
+      tenant: a
+      part-of: thanos
+  serviceName: thanos-store-shard-0
+  template:
+    metadata:
+      labels:
+        app: thanos-store
+        shard: shard-0
+        tenant: a
+        part-of: thanos
+    spec:
+      containers:
+      - args:
+        - store
+        - --data-dir=/var/thanos/store
+        - --objstore.config=$(OBJSTORE_CONFIG)
+        - --max-time=-2w
+        env:
+        - name: OBJSTORE_CONFIG
+          valueFrom:
+            secretKeyRef:
+              key: thanos-s3.yaml
+              name: thanos-objectstorage
+        image: quay.io/thanos/thanos:v0.14.0
+        livenessProbe:
+          failureThreshold: 8
+          httpGet:
+            path: /-/healthy
+            port: 10902
+            scheme: HTTP
+          periodSeconds: 30
+        name: thanos-store
+        ports:
+        - containerPort: 10901
+          name: grpc
+        - containerPort: 10902
+          name: http
+        readinessProbe:
+          failureThreshold: 20
+          httpGet:
+            path: /-/ready
+            port: 10902
+            scheme: HTTP
+          periodSeconds: 5
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /var/thanos/store
+          name: data
+          readOnly: false
+      terminationGracePeriodSeconds: 120
+      volumes:
+      - emptyDir: {}
+        name: data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: thanos-store
+    shard: shard-0
+    tenant: a
+    part-of: thanos
+  name: thanos-store-shard-0
+  namespace: thanos
+spec:
+  clusterIP: None
+  ports:
+  - name: grpc
+    port: 10901
+    targetPort: 10901
+  - name: http
+    port: 10902
+    targetPort: 10902
+  selector:
+    app: thanos-store
+    shard: shard-0
+    tenant: a
+    part-of: thanos
