@@ -152,4 +152,4 @@ $ curl -s http://query.local/api/v1/query?query="count(up)by("tenant_id")"|jq -r
 {"tenant_id":"b"} 1
 {"tenant_id":"cluster"} 17
 ```
-Either of the above outputs show that, *cluster*, *a* and *b* prometheus tenants are having 17, 1 and 1 scrape targets up and running. All these data are getting stored in thanos-receiver in real time by prometheus' [remote write queue](https://prometheus.io/docs/practices/remote_write/#remote-write-characteristics).
+Either of the above outputs show that, *cluster*, *a* and *b* prometheus tenants are having 17, 1 and 1 scrape targets up and running. All these data are getting stored in thanos-receiver in real time by prometheus' [remote write queue](https://prometheus.io/docs/practices/remote_write/#remote-write-characteristics). This model creates an oportunity for the tenant side prometheus to be nearly stateless yet maintain data resiliency.
