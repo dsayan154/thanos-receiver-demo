@@ -85,7 +85,7 @@ git clone https://github.com/dsayan154/thanos-receiver-demo.git
    ```
    kubectl apply -f thanos-store-shard-0.yaml
    ```
-   > We have configured it such that the thanos query only fans out to the store for data earlier than 2w. Upto 15d data are to be provided by the receiver pods. P.S: There is a overlap of 1d between the two time windows is intentional for data-resilency.
+   > We have configured it such that the thanos query only fans out to the store for data older than 2w. Data ealier than 15d are to be provided by the receiver pods. P.S: There is a overlap of 1d between the two time windows is intentional for data-resilency.
 ### Install Thanos Query
 1. Create a thanos query deployment, expose it through service and ingress
    ```
