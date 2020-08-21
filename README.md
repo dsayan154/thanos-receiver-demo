@@ -16,7 +16,7 @@ The above architecture obviously misses few features that one would also expect 
 
 Clone the repo: 
 ```
-TODO: repo link to be updated
+git clone https://github.com/dsayan154/thanos-receiver-demo.git
 ```
 
 ## Setup a local [KIND](https://kind.sigs.k8s.io/docs/user/quick-start/) cluster
