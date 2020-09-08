@@ -31,7 +31,7 @@
  ]
  ```
  - Soft tenancy -  If a hashring specifies no explicit tenants, then any tenant is considered a valid match; this allows for a cluster to provide soft-tenancy. Requests whose tenant ID matches no other hashring explicitly, will automatically land in this soft tenancy hashring. All incoming remote write requests which don't set the tenant header in the HTTP request, fall under soft tenancy and default tenant ID(configurable through the flag --receive.default-tenant-id) is attached to their metrics.
- - Hard tenancy - Hard tenants must set the tenant header in every HTTP request for remote write. Hard tenants in the Thanos receiver are configured in a hashring config file. Changes to this configuration must be orchestrated by a configuration management tool. When a remote write request is received by a Thanos receiver, it goes through the list of configured hard tenants. A hard tenant also has the number of associated receiver endpoints belonging to it. 
+ - Hard tenancy - Hard tenants must set the tenant header in every HTTP request for remote write. Hard tenants in the Thanos receiver are configured in a hashring config file. Changes to this configuration must be orchestrated by a configuration management tool. When a remote write request is received by a Thanos receiver, it goes through the list of configured hard tenants. A hard tenant also has the number of associated receiver endpoints belonging to it. <br>
  **P.S: A remote write request can be initially received by any receiver instance, however, will only be dispatched to receiver endpoints that correspond to that hard tenant.** 
 
 # Architecture
